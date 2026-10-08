@@ -15,7 +15,7 @@ CFLAGS   := -std=c17 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -g
 LDFLAGS  :=
 LDLIBS   :=
 
-# `make debug` adds AddressSanitizer + UndefinedBehaviorSanitizer
+# `make debug` builds a separate copy with AddressSanitizer + UndefinedBehaviorSanitizer
 SANITIZE := -fsanitize=address,undefined -fno-omit-frame-pointer
 
 # ---- Rules -----------------------------------------------------------------
@@ -35,9 +35,8 @@ $(BUILD_DIR):
 run: all
 	./$(BUILD_DIR)/$(TARGET)
 
-debug: CFLAGS  += -O0 $(SANITIZE)
-debug: LDFLAGS += $(SANITIZE)
-debug: clean all
+debug:
+	$(MAKE) BUILD_DIR=$(BUILD_DIR)/debug CFLAGS="$(CFLAGS) -O0 $(SANITIZE)"
 
 clean:
 	rm -rf $(BUILD_DIR)

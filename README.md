@@ -12,7 +12,7 @@ A Unix shell written in C.
 ```sh
 make          # build into build/shellc
 make run      # build and run
-make debug    # rebuild with AddressSanitizer + UBSan
+make debug    # build with AddressSanitizer + UBSan into build/debug/shellc
 make clean    # remove build/
 ```
 
