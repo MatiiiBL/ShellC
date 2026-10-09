@@ -2,12 +2,15 @@
 #include <stdlib.h>
 
 #include "input.h"
+#include "parser.h"
 
 #define PROMPT "$ " //the macro for replaceing the prompt for the $ as in the terminal
 
 int main(void)
 {
-    char line[MAX_LINE + 1]; // + 1 for the closing '\0' (I put it at the end of the input.c file)
+    char line[MAX_LINE + 1]; // + 1 for the closing '\0' that the read_line will add
+    char *argv[MAX_WORDS + 1]; // the words of the line, then a NULL
+    int argc;                  // how many words
 
     //infinite loop for asking the user prompts
     for (;;) {
@@ -30,7 +33,19 @@ int main(void)
             return EXIT_FAILURE;
         }
 
-        //test to check if it is working
-        puts(line); // read_line() drops the '\n', so puts() adds it back!!!
+        switch (parse_line(line, argv, &argc)) { //if it's fine
+        case PARSE_OK:
+            break;
+        case PARSE_TOO_MANY_ARGS: //Give the user the warning
+            fprintf(stderr, "error: too many arguments (max %d)\n", MAX_ARGS);
+            continue;
+        }
+
+        if (argc == 0) { // blank line: nothing to be done!!!
+            continue;
+        }
+
+        
+        putchar('\n');
     }
 }

@@ -28,6 +28,7 @@ static int read_byte(char *c)
 }
 
 //the one that will read the whole line
+//One byte at a time cause I prevent reading input that belongs to the commands we run
 enum read_result read_line(char *buf, size_t size)
 {
     size_t len = 0;            // amount stored in buf so far
@@ -48,17 +49,15 @@ enum read_result read_line(char *buf, size_t size)
         }
         got_anything = true;
 
-        if (c == '\n') { // if eof
+        if (c == '\n') { // if eol (the end of line)
 
-            // The '\n' counts towards the limit too: if buf is already full,
-            // the line plus its '\n' is too long.
-            if (len == max_len) { //I just check if the len got the buf full (including the "\n")
+            if (len == max_len) { // the current line + adding the '\n' would be too long later
                 too_long = true;
             }
             break;
         }
 
-        //if we have a null terminator 
+        //if we have a "\0" byte inside of the input 
         if (c == '\0') {
             has_nul = true;
         }
@@ -72,7 +71,7 @@ enum read_result read_line(char *buf, size_t size)
         }
     }
 
-    buf[len] = '\0'; // officially ready to close the string close the string
+    buf[len] = '\0'; // officially ready to close the string
 
     //just returning the status now
     if (!got_anything) {
