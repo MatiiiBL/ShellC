@@ -15,8 +15,10 @@ CFLAGS   := -std=c17 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -g
 LDFLAGS  :=
 LDLIBS   :=
 
-# `make debug` builds a separate copy with AddressSanitizer + UndefinedBehaviorSanitizer
-SANITIZE := -fsanitize=address,undefined -fno-omit-frame-pointer
+# `make debug` builds a separate copy with AddressSanitizer + UndefinedBehaviorSanitizer.
+# -fno-sanitize-recover makes undefined behaviour stop the program, instead of
+# only printing a warning and carrying on.
+SANITIZE := -fsanitize=address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer
 
 # ---- Rules -----------------------------------------------------------------
 .PHONY: all run debug clean rebuild

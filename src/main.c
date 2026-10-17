@@ -1,5 +1,7 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "builtins.h"
 #include "exec.h"
@@ -8,11 +10,34 @@
 
 #define PROMPT "$ " //the macro for replaceing the prompt for the $ as in the terminal
 
+// Does nothing: see survive_closed_pipes().
+static void on_sigpipe(int sig)
+{
+    (void)sig;
+}
+
+// Writing to a pipe that nobody reads anymore (e.g. our stderr after
+// `./shellc 2>&1 | head -1` has finished) sends us SIGPIPE, which kills the
+// shell by default. With this empty handler the write just fails instead.
+// (Not SIG_IGN: an ignored signal stays ignored in the programs we start,
+// while a handler is reset to the default by exec, so they are unaffected.)
+static void survive_closed_pipes(void)
+{
+    struct sigaction sa;
+    memset(&sa, 0, sizeof sa); // start with every field set to 0
+    sa.sa_handler = on_sigpipe;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART; // don't interrupt other system calls either
+    sigaction(SIGPIPE, &sa, NULL);
+}
+
 int main(void)
 {
     char line[MAX_LINE + 1]; // + 1 for the closing '\0' that the read_line will add
     char *argv[MAX_WORDS + 1]; // the words of the line, then a NULL
     int argc;                  // how many words
+
+    survive_closed_pipes();
 
     //infinite loop for asking the user prompts
     for (;;) {
