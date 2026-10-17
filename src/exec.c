@@ -49,5 +49,24 @@ void run_command(char *argv[])
 
     // Parent: wait until the child has finished.
     int status;
-    waitpid(pid, &status, 0);
+    while (waitpid(pid, &status, 0) == -1) {
+        if (errno != EINTR) {
+            perror("error: waitpid failed");
+            return;
+        }
+        // EINTR: a signal interrupted the waiting, so just wait again
+    }
+
+    // status packs up how the child ended; the W...() macros unpack it.
+    if (WIFEXITED(status)) {
+        // It ended by itself (returned from main or called exit) with a code:
+        // 0 means success, anything else means something went wrong.
+        int code = WEXITSTATUS(status);
+        if (code != 0) {
+            fprintf(stderr, "error: command exited with code %d\n", code);
+        }
+    } else if (WIFSIGNALED(status)) {
+        // A signal killed it (e.g. a crash, or someone ran kill -9 on it).
+        fprintf(stderr, "error: command terminated by signal %d\n", WTERMSIG(status));
+    }
 }
