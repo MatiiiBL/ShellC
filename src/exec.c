@@ -24,12 +24,20 @@ void run_command(char *argv[])
 
     if (pid == 0) {
         // Child: turn this copy into the program we want to run.
-        // If execv() works, it never comes back here.
-        execv(argv[0], argv);
+        // execvp() finds the program like this: if the name contains a '/'
+        // (like /bin/ls or ./a.out), it is used as a path directly; if not
+        // (like ls), each folder listed in $PATH is tried until one has it.
+        // If execvp() works, it never comes back here.
+        execvp(argv[0], argv);
 
-        // Still here, so execv() failed, and errno says why (e.g. "No such
+        // Still here, so execvp() failed, and errno says why (e.g. "No such
         // file or directory"). stderr has no buffer, so this is written at once.
-        fprintf(stderr, "error: %s: %s\n", argv[0], strerror(errno));
+        if (errno == ENOENT && strchr(argv[0], '/') == NULL) {
+            // a plain name that none of the $PATH folders has
+            fprintf(stderr, "error: %s: command not found\n", argv[0]);
+        } else {
+            fprintf(stderr, "error: %s: %s\n", argv[0], strerror(errno));
+        }
 
         // This copy must never go back to the shell's loop (there would be
         // two shells!), so it leaves right away.
