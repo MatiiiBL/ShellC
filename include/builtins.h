@@ -3,7 +3,8 @@
 
 // Built-in commands are run by the shell itself, without starting a new
 // process (fork + exec). This matters for commands that must change the
-// shell itself, like `exit` (which has to end the shell, not a child).
+// shell itself, like `exit` (which has to end the shell, not a child) and
+// `cd` (which has to change the shell's own current directory).
 
 enum builtin_result {
     NOT_A_BUILTIN, // argv[0] is not a built-in: run it as a program instead
