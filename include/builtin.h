@@ -1,5 +1,5 @@
-#ifndef SHELLC_BUILTINS_H
-#define SHELLC_BUILTINS_H
+#ifndef SHELLC_BUILTIN_H
+#define SHELLC_BUILTIN_H
 
 // Built-in commands are run by the shell itself, without starting a new
 // process (fork + exec). This matters for commands that must change the
