@@ -1,9 +1,20 @@
 #include "input.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdbool.h>
 #include <unistd.h>
 
+// Switches stdin back to normal "blocking" mode, where read() waits for input.
+// Returns true if stdin was non-blocking and has been switched back.
+static bool make_stdin_blocking(void)
+{
+    int flags = fcntl(STDIN_FILENO, F_GETFL);
+    if (flags == -1 || (flags & O_NONBLOCK) == 0) {
+        return false; // can't read the flags, or it was already blocking
+    }
+    return fcntl(STDIN_FILENO, F_SETFL, flags & ~O_NONBLOCK) != -1;
+}
 
 //helper for reading one byte at a time
 static int read_byte(char *c)
@@ -21,9 +32,17 @@ static int read_byte(char *c)
             return 0;
         }
         //just in case if we are interrupted by a signal to just repeat (not sure about this line, I'll test it later)
-        if (errno != EINTR) { 
-            return -1;
+        if (errno == EINTR) {
+            continue;
         }
+
+        // A program we ran may have left stdin "non-blocking": then read()
+        // doesn't wait for input, it fails with EAGAIN. Undo that and retry.
+        if ((errno == EAGAIN || errno == EWOULDBLOCK) && make_stdin_blocking()) {
+            continue;
+        }
+
+        return -1; // a real error
     }
 }
 

@@ -1,5 +1,8 @@
 #include "exec.h"
 
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -13,6 +16,7 @@ void run_command(char *argv[])
     pid_t pid = fork();
 
     if (pid == -1) {
+        perror("error: fork failed");
         // No child to wait for. (waitpid(-1, ...) would mean something like "wait for ANY
         // child", so we must not get there.)
         return;
@@ -23,8 +27,12 @@ void run_command(char *argv[])
         // If execv() works, it never comes back here.
         execv(argv[0], argv);
 
-        // Still here, so execv() failed. This copy must never go back to the
-        // shell's loop (there would be two shells!), so it leaves right away.
+        // Still here, so execv() failed, and errno says why (e.g. "No such
+        // file or directory"). stderr has no buffer, so this is written at once.
+        fprintf(stderr, "error: %s: %s\n", argv[0], strerror(errno));
+
+        // This copy must never go back to the shell's loop (there would be
+        // two shells!), so it leaves right away.
         // _exit() instead of exit(): it doesn't flush the stdio buffers the
         // child inherited from the shell, so nothing gets printed twice.
         // 127 is the exit code shells use for "the command could not be run".
