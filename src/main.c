@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "exec.h"
 #include "input.h"
 #include "parser.h"
 
@@ -45,7 +46,6 @@ int main(void)
             continue;
         }
 
-        
-        putchar('\n');
+        run_command(argv);
     }
 }
