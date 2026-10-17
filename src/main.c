@@ -8,7 +8,7 @@
 #include "input.h"
 #include "parser.h"
 
-#define PROMPT "$ " //the macro for replaceing the prompt for the $ as in the terminal
+#define PROMPT "$ " //the macro for replacing the prompt for the $ as in the terminal
 
 // Does nothing: see survive_closed_pipes().
 static void on_sigpipe(int sig)
@@ -41,7 +41,7 @@ int main(void)
 
     //infinite loop for asking the user prompts
     for (;;) {
-        //remember that the wording asks me to put in in stderr!
+        //remember that the wording asks me to put it in stderr!
         fputs(PROMPT, stderr);
 
         switch (read_line(line, sizeof line)) {

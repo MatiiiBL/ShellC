@@ -21,7 +21,7 @@ static int read_byte(char *c)
 {
     for (;;) {
         //signed size type in case read returns -1!!
-        ssize_t n = read(STDIN_FILENO, c, 1); //stdin is just 0 but I write it so its more readable
+        ssize_t n = read(STDIN_FILENO, c, 1); //stdin is just 0 but I write it so it's more readable
 
         //If we got something!
         if (n == 1) {
@@ -31,7 +31,7 @@ static int read_byte(char *c)
         if (n == 0) {
             return 0;
         }
-        //just in case if we are interrupted by a signal to just repeat (not sure about this line, I'll test it later)
+        //a signal interrupted read() while it was waiting: that's not an error, just try again
         if (errno == EINTR) {
             continue;
         }
@@ -47,7 +47,7 @@ static int read_byte(char *c)
 }
 
 //the one that will read the whole line
-//One byte at a time cause I prevent reading input that belongs to the commands we run
+//One byte at a time, so I never read input that belongs to the commands we run
 enum read_result read_line(char *buf, size_t size)
 {
     size_t len = 0;            // amount stored in buf so far
@@ -76,7 +76,7 @@ enum read_result read_line(char *buf, size_t size)
             break;
         }
 
-        //if we have a "\0" byte inside of the input 
+        //if we have a "\0" byte inside of the input
         if (c == '\0') {
             has_nul = true;
         }
@@ -85,7 +85,7 @@ enum read_result read_line(char *buf, size_t size)
         if (len < max_len) {
             buf[len] = c;
             len++;
-        } else { // buf is now full (so we just drop the byte buuut keep reading until I get \n 
+        } else { // buf is now full: we just drop the byte, but keep reading until I get the \n
             too_long = true;
         }
     }

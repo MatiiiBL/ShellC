@@ -1,10 +1,9 @@
-//just the header for checking if it exists or not. If it doesn't.
-//I just skip the definition of it (just in case to prevent already defined
-//errors)
+//include guard: if this header was already included before, everything up to
+//the #endif is skipped (this prevents "already defined" errors)
 #ifndef SHELLC_INPUT_H
 #define SHELLC_INPUT_H
 
-//to usesize_t
+//to use size_t
 #include <stddef.h>
 
 // I will only accept a line with max 1000 characters (including \n)
@@ -20,9 +19,9 @@ enum read_result {
 };
 
 
-//I read from stin to buffer dropping the \n 
+//I read from stdin to buffer dropping the \n
 //I return one of the 5 states
-//Note: the buffer must be MAX_LINE + 1 
+//Note: the buffer must be MAX_LINE + 1
 enum read_result read_line(char *buf, size_t size);
 
 #endif

@@ -43,6 +43,10 @@ debug:
 clean:
 	rm -rf $(BUILD_DIR)
 
-rebuild: clean all
+# Two separate steps, one after the other: as prerequisites (`rebuild: clean all`)
+# `make -j` could run them at the same time and delete build/ while building.
+rebuild:
+	$(MAKE) clean
+	$(MAKE) all
 
 -include $(DEPS)

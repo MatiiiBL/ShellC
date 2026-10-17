@@ -1,0 +1,31 @@
+# Builds the shell on Linux with gcc and clang on every push.
+# Any compiler warning makes the job fail.
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: ${{ matrix.compiler }} on Ubuntu
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          make CC=${{ matrix.compiler }} 2>&1 | tee build.log
+          if grep -q 'warning:' build.log; then
+            echo "::error::the compiler printed warnings (see above)"
+            exit 1
+          fi
+
+      - name: Build with sanitizers
+        run: make CC=${{ matrix.compiler }} debug
