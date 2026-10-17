@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "builtins.h"
 #include "exec.h"
 #include "input.h"
 #include "parser.h"
@@ -47,6 +48,16 @@ int main(void)
 
         if (argc == 0) { // blank line: nothing to be done!!!
             continue;
+        }
+
+        // Built-ins first: the shell runs those itself, without a new process.
+        switch (run_builtin(argc, argv)) {
+        case BUILTIN_EXIT:
+            return EXIT_SUCCESS; // `exit`: give control back to whoever started us
+        case BUILTIN_RAN:
+            continue;
+        case NOT_A_BUILTIN:
+            break;
         }
 
         run_command(argv);
