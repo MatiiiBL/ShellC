@@ -73,10 +73,11 @@ enum parse_result parse_line(char *line, char *argv[], int *argc)
         }
     }
 
-    if (state != BETWEEN_WORDS) {
-        // The line ended inside a word: close that word too. (For now, a
-        // quote that is never closed just ends together with the line.)
-        line[out] = '\0';
+    if (state == IN_QUOTES) {
+        return PARSE_MISMATCHED_QUOTES; // the line ended before the closing quote
+    }
+    if (state == IN_WORD) {
+        line[out] = '\0'; // the line ended inside a word: close that word too
     }
 
     argv[count] = NULL; // marks the end of the list!!

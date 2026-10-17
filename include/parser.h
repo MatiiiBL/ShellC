@@ -12,6 +12,7 @@
 enum parse_result {
     PARSE_OK,            // 0
     PARSE_TOO_MANY_ARGS, // 1 - more than MAX_ARGS arguments
+    PARSE_MISMATCHED_QUOTES, // 2 - a quote was opened but never closed
 };
 
 //this is for splitting the line into words separated by spaces

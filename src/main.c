@@ -40,6 +40,9 @@ int main(void)
         case PARSE_TOO_MANY_ARGS: //Give the user the warning
             fprintf(stderr, "error: too many arguments (max %d)\n", MAX_ARGS);
             continue;
+        case PARSE_MISMATCHED_QUOTES:
+            fputs("error: mismatched quotes\n", stderr);
+            continue;
         }
 
         if (argc == 0) { // blank line: nothing to be done!!!
